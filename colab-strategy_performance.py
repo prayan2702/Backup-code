@@ -1,4 +1,5 @@
 #Pandas just released 2.0.0, which breaks QuantStats:
+pip install quantstats==0.0.25
 pip install pandas==1.5.3
 #*********************************
 
