@@ -74,4 +74,4 @@ returns_df.rename(columns={"NAV": "Returns"}, inplace=True)
 qs.reports.full(returns, benchmark=nifty50)
 
 # You can save it as html
-#qs.reports.html(returns, "your_full_report.html", benchmark=nifty50)
+qs.reports.html(returns, nifty50, title="Portfolio Performance vs Nifty50", output="portfolio_report.html")
