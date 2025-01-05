@@ -130,9 +130,17 @@ with col2:
         yaxis=dict(
             showgrid=True,  # Enable grid lines
             gridcolor='white',  # Set grid lines to white
-            showline=True,  # Axis lines
+            showline=True,  # Show axis lines
             linecolor='white'  # Axis line color
+        ),
+        legend=dict(
+            orientation="h",  # Horizontal orientation
+            yanchor="bottom",  # Align to bottom of the legend box
+            y=1.02,  # Place above the chart
+            xanchor="center",
+            x=0.5  # Center the legend horizontally
         )
+
     )
     st.plotly_chart(fig_dd, use_container_width=True)
 
