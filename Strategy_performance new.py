@@ -91,8 +91,8 @@ with col2:
                    line=dict(color='red')))
     st.plotly_chart(fig, use_container_width=True)
 
-    st.write("### Drawdown Chart")
-    fig_dd = px.line(filtered_data, x='date', y='dd', title='Drawdown Over Time')
+    st.info("##### Drawdown Live Chart")
+    fig_dd = px.line(filtered_data, x='date', y='dd')
     fig_dd.update_traces(line_color='orange')
     st.plotly_chart(fig_dd, use_container_width=True)
 
