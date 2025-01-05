@@ -83,10 +83,10 @@ with col2:
     st.info("##### Model Live Chart")
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['nav'], mode='lines', name='Strategy',
-                             line=dict(color='blue')))
+                             line=dict(color='#244bef', width=1)))
     fig.add_trace(
         go.Scatter(x=filtered_data['date'], y=filtered_data['nifty50 value'], mode='lines', name='Nifty50',
-                   line=dict(color='red')))
+                   line=dict(color='#d86e51', width=1)))
     fig.update_layout(
         height=600,
         plot_bgcolor='#f0f2f6',  # Light grey background
@@ -114,7 +114,7 @@ with col2:
 
     st.info("##### Drawdown Live Chart")
     fig_dd = px.line(filtered_data, x='date', y='dd')
-    fig_dd.update_traces(line_color='orange')
+    fig_dd.update_traces(line_color='#244bef')
     fig_dd.update_layout(
         plot_bgcolor='#f0f2f6',
         xaxis=dict(
