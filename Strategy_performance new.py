@@ -113,8 +113,12 @@ with col2:
     st.plotly_chart(fig, use_container_width=True)
 
     st.info("##### Drawdown Live Chart")
-    fig_dd = px.line(filtered_data, x='date', y='dd')
-    fig_dd.update_traces(line_color='#244bef', line=dict(width=1))
+    fig_dd = go.Figure()
+    fig_dd.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['dd'], mode='lines', name='Strategy Drawdown',
+                                line=dict(color='#244bef', width=1)))
+    fig_dd.add_trace(
+        go.Scatter(x=filtered_data['date'], y=filtered_data['dd_n50'], mode='lines', name='Nifty50 Drawdown',
+                   line=dict(color='#FB3234', width=1)))
     fig_dd.update_layout(
         plot_bgcolor='#f0f2f6',
         xaxis=dict(
