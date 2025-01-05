@@ -62,14 +62,14 @@ with col4:
     else:
         st.metric("Month Change", "Insufficient Data")
 
-st.info("Status - Updated Every 20 min! [Last Update: {}]".format(
+st.info("Last Update: {}".format(
     datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
 # Date Range Selector and Three-Column Layout
 col1, col2, col3 = st.columns([2, 4, 2])
 
 with col1:
-    st.write("#### Filter by Date Range")
+    st.info("##### Filter by Date Range")
     start_date = st.date_input("Start Date", value=data['date'].min(), key='start_date')
     end_date = st.date_input("End Date", value=data['date'].max(), key='end_date')
 
@@ -82,7 +82,7 @@ if filtered_data.empty:
 
 # Live Charts Section in col2
 with col2:
-    st.write("### Model Live Chart")
+    st.info("##### Model Live Chart")
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['nav'], mode='lines', name='NAV',
                              line=dict(color='blue')))
@@ -98,7 +98,7 @@ with col2:
 
 # Model Performance Section in col3
 with col3:
-    st.write("### Model Performance")
+    st.info("##### Model Performance")
     return_type = st.radio("Select Return Type", ['Inception', 'Yearly', 'Monthly', 'Weekly', 'Daily'], index=1)
 
 
