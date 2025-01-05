@@ -87,7 +87,19 @@ with col2:
     fig.add_trace(
         go.Scatter(x=filtered_data['date'], y=filtered_data['nifty50 value'], mode='lines', name='Nifty50',
                    line=dict(color='red')))
-    fig.update_layout(plot_bgcolor='#f0f2f6', xaxis=dict(showgrid=True), yaxis=dict(showgrid=True))
+    fig.update_layout(
+        height=600,
+        plot_bgcolor='#f0f2f6',
+        xaxis=dict(showgrid=True),
+        yaxis=dict(showgrid=True),
+        legend=dict(
+            orientation="h",  # Horizontal orientation
+            yanchor="bottom",  # Align to bottom of the legend box
+            y=1.02,  # Place above the chart
+            xanchor="center",
+            x=0.5  # Center the legend horizontally
+        )
+    )
     st.plotly_chart(fig, use_container_width=True)
 
     st.info("##### Drawdown Live Chart")
