@@ -42,7 +42,7 @@ nifty50_value = pd.to_numeric(nifty50_value_raw, errors='coerce')
 day_change = pd.to_numeric(day_change_raw, errors='coerce')
 
 # Total Account Overview Section
-st.write("## Total Account Overview", unsafe_allow_html=True)
+st.write("### Total Account Overview", unsafe_allow_html=True)
 col1, col2, col3, col4 = st.columns([3, 2, 2, 3])
 
 with col1:
@@ -64,7 +64,7 @@ st.info("Last Update: {}".format(
     datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
 # Date Range Selector and Three-Column Layout
-col1, col2, col3 = st.columns([2, 4, 2])
+col1, col2, col3 = st.columns([1, 4, 1])
 
 with col1:
     st.info("##### Filter by Date Range")
