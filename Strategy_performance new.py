@@ -36,22 +36,36 @@ data = load_data(google_sheets_url)
 portfolio_value_raw = data.iloc[0, 0]  # Portfolio value from cell [0,0]
 nifty50_value_raw = data.iloc[0, 2]  # Nifty50 value from cell [0,2]
 day_change_raw = data.iloc[2, 0]  # Day Change from cell [0,3]
+absolute_gain_raw = data.iloc[0, 1]
+previous_value_raw = data.iloc[4, 0]
 
 portfolio_value = pd.to_numeric(portfolio_value_raw, errors='coerce')
 nifty50_value = pd.to_numeric(nifty50_value_raw, errors='coerce')
 day_change = pd.to_numeric(day_change_raw, errors='coerce')
+absolute_gain = pd.to_numeric(absolute_gain_raw, errors='coerce')
+previous_value = pd.to_numeric(previous_value_raw, errors='coerce')
+
+# Calculate instant day change
+day_change = portfolio_value - previous_value
+day_change_percent = (day_change / previous_value * 100) if previous_value != 0 else 0
 
 # Total Account Overview Section
 st.write("### Total Account Overview", unsafe_allow_html=True)
-col1, col2, col3, col4 = st.columns([3, 2, 2, 3])
+col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])  # 5 equal columns
 
 with col1:
-    st.metric("Total Account Value   ", f"₹{portfolio_value:,.0f}")
+    st.metric("Total Account Value", f"₹{portfolio_value:,.0f}")
+
 with col2:
-    st.metric("Day Change", f"₹{day_change:,.0f}", f"{data['day change %'].iloc[-1]:,.2f}%")
+    st.metric("Absolute Gain", f"₹{absolute_gain:,.0f}")
+
 with col3:
-    st.metric("NIFTY50 Benchmark", f"{nifty50_value:,.0f}")
+    st.metric("Day Change", f"₹{day_change:,.0f}", f"{day_change_percent:.2f}%")
+
 with col4:
+    st.metric("NIFTY50 Benchmark", f"{nifty50_value:,.0f}")
+
+with col5:
     if len(data) > 30:
         month_change = data['current value'].iloc[-1] - data['current value'].iloc[-30]
         month_change_percent = (month_change / data['current value'].iloc[-30] * 100) if \
