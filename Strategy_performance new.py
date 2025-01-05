@@ -85,10 +85,10 @@ with col2:
     st.info("##### Model Live Chart")
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['nav'], mode='lines', name='NAV',
-                             line=dict(color='blue')))
+                             line=dict(color='royalblue')))
     fig.add_trace(
         go.Scatter(x=filtered_data['date'], y=filtered_data['nifty50 value'], mode='lines', name='Nifty50',
-                   line=dict(color='red')))
+                   line=dict(color='tomato')))
     st.plotly_chart(fig, use_container_width=True)
 
     st.info("##### Drawdown Live Chart")
