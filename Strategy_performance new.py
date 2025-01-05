@@ -9,7 +9,6 @@ st.set_page_config(layout="wide")  # Set full-width layout
 # Replace with your actual Google Sheets CSV URL
 google_sheets_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTuyGRVZuafIk2s7moScIn5PAUcPYEyYIOOYJj54RXYUeugWmOP0iIToljSEMhHrg_Zp8Vab6YvBJDV/pub?output=csv"
 
-
 @st.cache_data(ttl=0)  # Caching har baar bypass hoga
 def load_data(url):
     data = pd.read_csv(url, header=0)
@@ -30,7 +29,6 @@ def load_data(url):
 
     data.fillna(0, inplace=True)
     return data
-
 
 # Load data
 data = load_data(google_sheets_url)
@@ -84,23 +82,24 @@ if filtered_data.empty:
 with col2:
     st.info("##### Model Live Chart")
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['nav'], mode='lines', name='NAV',
-                             line=dict(color='royalblue')))
+    fig.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['nav'], mode='lines', name='Multi-Factor',
+                             line=dict(color='blue')))
     fig.add_trace(
         go.Scatter(x=filtered_data['date'], y=filtered_data['nifty50 value'], mode='lines', name='Nifty50',
-                   line=dict(color='tomato')))
+                   line=dict(color='red')))
+    fig.update_layout(plot_bgcolor='#f0f2f6', xaxis=dict(showgrid=True), yaxis=dict(showgrid=True))
     st.plotly_chart(fig, use_container_width=True)
 
     st.info("##### Drawdown Live Chart")
     fig_dd = px.line(filtered_data, x='date', y='dd')
     fig_dd.update_traces(line_color='orange')
+    fig_dd.update_layout(plot_bgcolor='#f0f2f6', xaxis=dict(showgrid=True), yaxis=dict(showgrid=True))
     st.plotly_chart(fig_dd, use_container_width=True)
 
 # Model Performance Section in col3
 with col3:
     st.info("##### Model Performance")
     return_type = st.radio("Select Return Type", ['Inception', 'Yearly', 'Monthly', 'Weekly', 'Daily'], index=1)
-
 
     def calculate_performance(return_type):
         latest_value = filtered_data['nav'].iloc[-1]
@@ -112,8 +111,26 @@ with col3:
             yearly_data = filtered_data[filtered_data['date'] >= past_date]
             if not yearly_data.empty:
                 return (latest_value - yearly_data['nav'].iloc[0]) / yearly_data['nav'].iloc[0] * 100
-
+        elif return_type == 'Monthly':
+            past_date = filtered_data['date'].max() - pd.DateOffset(months=1)
+            monthly_data = filtered_data[filtered_data['date'] >= past_date]
+            if not monthly_data.empty:
+                return (latest_value - monthly_data['nav'].iloc[0]) / monthly_data['nav'].iloc[0] * 100
+        elif return_type == 'Weekly':
+            past_date = filtered_data['date'].max() - pd.DateOffset(weeks=1)
+            weekly_data = filtered_data[filtered_data['date'] >= past_date]
+            if not weekly_data.empty:
+                return (latest_value - weekly_data['nav'].iloc[0]) / weekly_data['nav'].iloc[0] * 100
+        elif return_type == 'Daily':
+            if len(filtered_data) > 1:
+                return (filtered_data['nav'].iloc[-1] - filtered_data['nav'].iloc[-2]) / filtered_data['nav'].iloc[-2] * 100
 
     performance = calculate_performance(return_type)
     if performance is not None:
         st.write(f"{return_type} Performance: {performance:.2f}%")
+
+    # Add performance table
+    st.info("##### Performance Table")
+    table_data = filtered_data[['date', 'day change %', 'nifty50 change %']].copy()
+    table_data.rename(columns={'day change %': 'strategy', 'nifty50 change %': 'nifty50'}, inplace=True)
+    st.dataframe(table_data)
