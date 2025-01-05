@@ -179,6 +179,26 @@ with col3:
 
     # Add performance table
     st.info("##### Performance Table")
+
+    # Format the 'date' column to 'dd-mm-yyyy' format
     table_data = filtered_data[['date', 'day change %', 'nifty50 change %']].copy()
+    table_data['date'] = table_data['date'].dt.strftime('%d-%m-%Y')  # Format date
     table_data.rename(columns={'day change %': 'strategy', 'nifty50 change %': 'nifty50'}, inplace=True)
-    st.dataframe(table_data)
+
+    # Round values to 2 decimal points (force format as string)
+    table_data['strategy'] = table_data['strategy'].apply(lambda x: f"{x:.2f}")
+    table_data['nifty50'] = table_data['nifty50'].apply(lambda x: f"{x:.2f}")
+
+
+    # Apply conditional formatting
+    def color_positive_negative(val):
+        """Style positive values green and negative values light red."""
+        color = '#caf1b0' if float(val) > 0 else '#f7e3e5'
+        return f'background-color: {color}'
+
+
+    # Display the table with formatting using st.dataframe
+    styled_table = table_data.style.applymap(color_positive_negative, subset=['strategy', 'nifty50'])
+
+    # Show dataframe properly in Streamlit
+    st.dataframe(styled_table)
