@@ -82,16 +82,26 @@ if filtered_data.empty:
 with col2:
     st.info("##### Model Live Chart")
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['nav'], mode='lines', name='Multi-Factor',
+    fig.add_trace(go.Scatter(x=filtered_data['date'], y=filtered_data['nav'], mode='lines', name='Strategy',
                              line=dict(color='blue')))
     fig.add_trace(
         go.Scatter(x=filtered_data['date'], y=filtered_data['nifty50 value'], mode='lines', name='Nifty50',
                    line=dict(color='red')))
     fig.update_layout(
         height=600,
-        plot_bgcolor='#f0f2f6',
-        xaxis=dict(showgrid=True),
-        yaxis=dict(showgrid=True),
+        plot_bgcolor='#f0f2f6',  # Light grey background
+        xaxis=dict(
+            showgrid=True,  # Enable grid lines
+            gridcolor='white',  # Set grid lines to white
+            showline=True,  # Show axis lines
+            linecolor='white'  # Axis line color
+        ),
+        yaxis=dict(
+            showgrid=True,  # Enable grid lines
+            gridcolor='white',  # Set grid lines to white
+            showline=True,  # Show axis lines
+            linecolor='white'  # Axis line color
+        ),
         legend=dict(
             orientation="h",  # Horizontal orientation
             yanchor="bottom",  # Align to bottom of the legend box
@@ -105,7 +115,21 @@ with col2:
     st.info("##### Drawdown Live Chart")
     fig_dd = px.line(filtered_data, x='date', y='dd')
     fig_dd.update_traces(line_color='orange')
-    fig_dd.update_layout(plot_bgcolor='#f0f2f6', xaxis=dict(showgrid=True), yaxis=dict(showgrid=True))
+    fig_dd.update_layout(
+        plot_bgcolor='#f0f2f6',
+        xaxis=dict(
+            showgrid=True,  # Enable grid lines
+            gridcolor='white',  # Set grid lines to white
+            showline=True,  # Show axis lines
+            linecolor='white'  # Axis line color
+        ),
+        yaxis=dict(
+            showgrid=True,  # Enable grid lines
+            gridcolor='white',  # Set grid lines to white
+            showline=True,  # Show axis lines
+            linecolor='white'  # Axis line color
+        )
+    )
     st.plotly_chart(fig_dd, use_container_width=True)
 
 # Model Performance Section in col3
