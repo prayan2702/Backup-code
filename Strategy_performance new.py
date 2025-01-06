@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import datetime
+import yfinance as yf
+from datetime import date, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
 import pytz
@@ -34,6 +36,62 @@ def load_data(url):
 
 # Load data
 data = load_data(google_sheets_url)
+
+#*******************************************
+# Helper function to fetch Nifty50 data
+def get_nifty50_data(start_date, end_date):
+    """Fetches Nifty50 data from Yahoo Finance."""
+    nifty = yf.Ticker("^NSEI")  # Nifty50 ticker symbol
+    hist = nifty.history(start=start_date, end=end_date)
+    return hist
+
+# Get yesterday's and today's date
+yesterday = date.today() - timedelta(days=1)
+today = date.today()
+
+# Ensure yesterday is not Saturday or Sunday
+if yesterday.weekday() >= 5:
+    yesterday -= timedelta(days=yesterday.weekday() - 4)
+
+# Get Nifty50 data for yesterday and today
+nifty_yesterday_data = get_nifty50_data(yesterday, yesterday + timedelta(days=1))
+nifty_today_data = get_nifty50_data(today, today + timedelta(days=1))
+
+# Get current Nifty50 value
+nifty = yf.Ticker("^NSEI")
+nifty_info = nifty.info
+
+# Get yesterday's closing price
+if len(nifty_yesterday_data) >= 1:
+    nifty_yesterday = nifty_yesterday_data['Close'].iloc[-1]
+else:
+    nifty_yesterday = 0
+
+# Try to get today's closing price
+if len(nifty_today_data) >= 1:
+  nifty_today_close = nifty_today_data['Close'].iloc[-1]
+else:
+  nifty_today_close = 0
+
+# Try to get current price, with fallbacks
+if "currentPrice" in nifty_info:
+    nifty_current = nifty_info["currentPrice"]
+elif "regularMarketPrice" in nifty_info:
+    nifty_current = nifty_info["regularMarketPrice"]
+else:
+    nifty_current = nifty_today_close  # Fallback to today's close
+
+# If there is no current price, we use the close
+if nifty_current == 0:
+  nifty_current = nifty_today_close
+
+# Calculate Nifty50 percentage change
+if nifty_yesterday != 0:
+    nifty_change_percent = ((nifty_current - nifty_yesterday) / nifty_yesterday) * 100
+else:
+    nifty_change_percent = 0
+
+#******************************************
 
 portfolio_value_raw = data.iloc[0, 0]  # Portfolio value from cell [0,0]
 nifty50_value_raw = data.iloc[0, 2]  # Nifty50 value from cell [0,2]
@@ -120,7 +178,7 @@ with col3:
 
 with col4:
     st.markdown("<b style='font-size: 18px;'>NIFTY50 Benchmark</b>", unsafe_allow_html=True)
-    st.metric(label="", value=f"{format_indian_currency(nifty50_value)}")
+    st.metric(label="", value=f"{format_indian_currency(nifty_current)}", delta=f"{nifty_change_percent:.2f}%")
 
 with col5:
     st.markdown("<b style='font-size: 18px;'>Month Change</b>", unsafe_allow_html=True)
