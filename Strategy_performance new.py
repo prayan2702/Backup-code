@@ -187,15 +187,20 @@ with col4:
     st.metric(label="", value=f"{format_indian_currency(nifty_current)}", delta=f"{nifty_change_percent:.2f}%")
 
 with col5:
-    st.markdown("<b style='font-size: 18px;'>Month Change</b>", unsafe_allow_html=True)
-    if len(data) > 30:
-        month_change = data['current value'].iloc[-1] - data['current value'].iloc[-30]
-        month_change_percent = (month_change / data['current value'].iloc[-30] * 100) if \
-            data['current value'].iloc[-30] != 0 else 0
-        st.metric(label="", value=f"₹{format_indian_currency(month_change)}", delta=f"{month_change_percent:.2f}%")
+    st.markdown("<b style='font-size: 18px;'>Current Drawdown</b>", unsafe_allow_html=True)
+    if 'dd' in data.columns:  # Ensure 'dd' column exists
+        current_drawdown_percent = data['dd'].iloc[-1]  # Get the latest drawdown percentage
+        
+        if current_drawdown_percent == 0:
+            # For 0% drawdown
+            st.metric(label="", value="0.00%")
+        else:
+            # Format with down arrow and red color for negative drawdown
+            formatted_percent = f"↓{abs(current_drawdown_percent):.2f}%"  # Ensure arrow and value
+            st.metric(label="", value=formatted_percent, delta="", delta_color="inverse")
     else:
-        st.metric(label="", value="Insufficient Data")
-
+        # Handle missing data case
+        st.metric(label="", value="Data Unavailable")
 # Display the Last Update Time
 desired_timezone = pytz.timezone('Asia/Kolkata')  # India Standard Time (IST)
 utc_now = datetime.datetime.now(pytz.utc)
@@ -355,3 +360,5 @@ with col3:
     # Show dataframe properly in Streamlit
     st.dataframe(styled_table, hide_index=True)
     
+
+   
