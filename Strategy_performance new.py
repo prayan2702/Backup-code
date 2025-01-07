@@ -145,25 +145,31 @@ try:
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 except locale.Error:
     print("Warning: 'en_US.UTF-8' locale not supported. Number formatting might be incorrect.")
+    
 # Total Account Overview Section
 st.write("### Total Account Overview", unsafe_allow_html=True)
 col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])  # 5 equal columns
 
-# Custom CSS to reduce space between st.markdown and st.metric
+# Custom CSS to reduce space between markdown and metric components
 st.markdown(
     """
     <style>
         div[data-testid="metric-container"] {
-            margin-top: -20px; /* Adjust the value as needed */
+            margin-top: -25px; /* Adjust to reduce space between metric and markdown */
         }
         div[data-testid="stMarkdownContainer"] > p {
-            margin-bottom: 0px;
+            margin-bottom: -20px; /* Tighter gap between markdown text and metric */
+        }
+        /* Fine-tuning st.info box alignment */
+        div.stAlert {
+            margin-top: 0px;  /* Pull st.info upwards */
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
+# Columns with metrics
 with col1:
     st.markdown("<b style='font-size: 18px;'>Total Account Value</b>", unsafe_allow_html=True)
     st.metric(label="", value=f"₹{format_indian_currency(portfolio_value)}")
@@ -190,15 +196,13 @@ with col5:
     else:
         st.metric(label="", value="Insufficient Data")
 
-# Define your desired time zone (replace with your actual time zone)
-desired_timezone = pytz.timezone('Asia/Kolkata')  # Example: India Standard Time (IST)
-# Get the current time in UTC
+# Display the Last Update Time
+desired_timezone = pytz.timezone('Asia/Kolkata')  # India Standard Time (IST)
 utc_now = datetime.datetime.now(pytz.utc)
-# Convert to the desired time zone
 local_now = utc_now.astimezone(desired_timezone)
-# Format the time for display
-formatted_time = local_now.strftime('%d-%m-%Y %H:%M:%S')  # DD-MM-YYYY
-# Display the time in Streamlit
+formatted_time = local_now.strftime('%d-%m-%Y %H:%M:%S')
+
+# st.info for the Last Update
 st.info(f"Last Update: {formatted_time}")
 
 # Date Range Selector and Three-Column Layout
@@ -215,7 +219,6 @@ filtered_data = data[(data['date'] >= pd.Timestamp(start_date)) & (data['date'] 
 if filtered_data.empty:
     st.error("No data available for the selected date range.")
     st.stop()
-
 # Live Charts Section in col2
 # Live Charts Section in col2
 with col2:
@@ -320,34 +323,35 @@ with col3:
     performance = calculate_performance(return_type)
     if performance is not None:
         st.write(f"{return_type} Performance: {performance:.2f}%")
-
+    
     # Add performance table
     st.info("##### Performance Table")
-
+    
     # Format the 'date' column to 'dd-mm-yyyy' format
     table_data = filtered_data[['date', 'day change %', 'nifty50 change %']].copy()
-
+    
     # Sort by 'date' in descending order (before formatting)
     table_data.sort_values(by='date', ascending=False, inplace=True)
-
+    
     # Format the 'date' column to 'dd-mm-yyyy' format
     table_data['date'] = table_data['date'].dt.strftime('%d-%m-%Y')  # Format date
     table_data.rename(columns={'date': 'Date','day change %': 'Strategy', 'nifty50 change %': 'Nifty50'}, inplace=True)
-
+    
     # Round values to 2 decimal points (force format as string)
     table_data['Strategy'] = table_data['Strategy'].apply(lambda x: f"{x:.2f}")
     table_data['Nifty50'] = table_data['Nifty50'].apply(lambda x: f"{x:.2f}")
-
-
+    
+    
     # Apply conditional formatting
     def color_positive_negative(val):
         """Style positive values green and negative values light red."""
         color = '#caf1b0' if float(val) > 0 else '#f7e3e5'
         return f'background-color: {color}'
-
-
+    
+    
     # Display the table with formatting using st.dataframe
     styled_table = table_data.style.applymap(color_positive_negative, subset=['Strategy', 'Nifty50'])
-
+    
     # Show dataframe properly in Streamlit
     st.dataframe(styled_table, hide_index=True)
+    
