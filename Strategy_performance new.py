@@ -155,14 +155,14 @@ st.markdown(
     """
     <style>
         div[data-testid="metric-container"] {
-            margin-top: -25px; /* Adjust to reduce space between metric and markdown */
+            margin-top: -30px; /* Adjust to reduce space between metric and markdown */
         }
         div[data-testid="stMarkdownContainer"] > p {
-            margin-bottom: -20px; /* Tighter gap between markdown text and metric */
+            margin-bottom: -35px; /* Tighter gap between markdown text and metric */
         }
         /* Fine-tuning st.info box alignment */
         div.stAlert {
-            margin-top: 0px;  /* Pull st.info upwards */
+            margin-top: 10px;  /* Pull st.info upwards */
         }
     </style>
     """,
@@ -208,7 +208,7 @@ local_now = utc_now.astimezone(desired_timezone)
 formatted_time = local_now.strftime('%d-%m-%Y %H:%M:%S')
 
 # st.info for the Last Update
-st.info(f"Last Update: {formatted_time}")
+st.write(f"Last Update: {formatted_time}")
 
 # Date Range Selector and Three-Column Layout
 col1, col2, col3 = st.columns([1, 4, 1])
