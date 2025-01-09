@@ -37,7 +37,6 @@ def load_data(url):
 # Load data
 data = load_data(google_sheets_url)
 
-#*******************************************
 # Helper function to fetch Nifty50 data
 def get_nifty50_data(start_date, end_date):
     """Fetches Nifty50 data from Yahoo Finance."""
@@ -145,9 +144,18 @@ try:
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 except locale.Error:
     print("Warning: 'en_US.UTF-8' locale not supported. Number formatting might be incorrect.")
+# Display the Last Update Time
+desired_timezone = pytz.timezone('Asia/Kolkata')  # India Standard Time (IST)
+utc_now = datetime.datetime.now(pytz.utc)
+local_now = utc_now.astimezone(desired_timezone)
+formatted_time = local_now.strftime('%d-%m-%Y %H:%M:%S')
+# st.info for the Last Update
+st.write(f"Last Update: {formatted_time}")
+st.markdown("<br><br>", unsafe_allow_html=True)
+
     
 # Total Account Overview Section
-st.write("### Total Account Overview", unsafe_allow_html=True)
+# st.write("### Total Account Overview", unsafe_allow_html=True)
 col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])  # 5 equal columns
 
 # Custom CSS to reduce space between markdown and metric components
@@ -155,14 +163,14 @@ st.markdown(
     """
     <style>
         div[data-testid="metric-container"] {
-            margin-top: -30px; /* Adjust to reduce space between metric and markdown */
+            margin-top: -90px; /* Adjust to reduce space between metric and markdown */
         }
         div[data-testid="stMarkdownContainer"] > p {
-            margin-bottom: -35px; /* Tighter gap between markdown text and metric */
+            margin-bottom: -90px; /* Tighter gap between markdown text and metric */
         }
         /* Fine-tuning st.info box alignment */
         div.stAlert {
-            margin-top: 10px;  /* Pull st.info upwards */
+            margin-top: -15px;  /* Pull st.info upwards */
         }
     </style>
     """,
@@ -201,14 +209,6 @@ with col5:
     else:
         # Handle missing data case
         st.metric(label="", value="Data Unavailable")
-# Display the Last Update Time
-desired_timezone = pytz.timezone('Asia/Kolkata')  # India Standard Time (IST)
-utc_now = datetime.datetime.now(pytz.utc)
-local_now = utc_now.astimezone(desired_timezone)
-formatted_time = local_now.strftime('%d-%m-%Y %H:%M:%S')
-
-# st.info for the Last Update
-st.write(f"Last Update: {formatted_time}")
 
 # Date Range Selector and Three-Column Layout
 col1, col2, col3 = st.columns([1, 4, 1])
@@ -224,7 +224,7 @@ filtered_data = data[(data['date'] >= pd.Timestamp(start_date)) & (data['date'] 
 if filtered_data.empty:
     st.error("No data available for the selected date range.")
     st.stop()
-# Live Charts Section in col2
+#************************
 # Live Charts Section in col2
 with col2:
     st.info("##### Model Live Chart")
@@ -328,6 +328,7 @@ with col3:
     performance = calculate_performance(return_type)
     if performance is not None:
         st.write(f"{return_type} Performance: {performance:.2f}%")
+        st.markdown("<br><br><br><br>", unsafe_allow_html=True)
     
     # Add performance table
     st.info("##### Performance Table")
