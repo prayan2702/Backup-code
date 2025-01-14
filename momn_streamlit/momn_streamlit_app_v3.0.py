@@ -111,11 +111,11 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Dropdown options with display labels and corresponding values
 ranking_options = {
-    "AvgSharpe 9M/6M/3M": "avgSharpe9_6_3",  # New method
-    "Sharpe12M": "sharpe12M",
-    "Sharpe3M":"sharpe3M",
     "AvgSharpe 12M/6M/3M": "avgSharpe",
-    "AvgSharpe 12M/9M/6M/3M": "avg_All"
+    "AvgSharpe 9M/6M/3M": "avgSharpe9_6_3",  # New method
+    "AvgSharpe 12M/9M/6M/3M": "avg_All",
+    "Sharpe12M": "sharpe12M",
+    "Sharpe3M":"sharpe3M"
 }
 # Display dropdown for ranking method selection
 ranking_method_display = st.selectbox(
@@ -130,7 +130,7 @@ ranking_method = ranking_options[ranking_method_display]
 
 # Select Universe with default value as 'N750'
 universe = ['Nifty50', 'Nifty100', 'Nifty200', 'Nifty250', 'Nifty500', 'N750', 'AllNSE']
-U = st.selectbox('Select Universe:', universe, index=5)  # Default value is 'N750' (index 5)
+U = st.selectbox('Select Universe:', universe, index=6)  # Default value is 'AllNSE' (index 6)
 
 # Date Picker for Lookback Start Date
 selected_date = st.date_input("Select Lookback Starting Date", datetime.today())
