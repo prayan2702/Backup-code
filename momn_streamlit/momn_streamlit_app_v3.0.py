@@ -111,7 +111,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Dropdown options with display labels and corresponding values
 ranking_options = {
-    "AvgSharpe 12M/6M/3M": "avgSharpe",
+    "AvgSharpe 12M/6M/3M": "avgSharpe12_6_3",
     "AvgSharpe 9M/6M/3M": "avgSharpe9_6_3",  # New method
     "AvgSharpe 12M/9M/6M/3M": "avg_All",
     "Sharpe12M": "sharpe12M",
@@ -351,16 +351,15 @@ if start_button:
     dfStats['sharpe6M'] = getSharpeRoC(dfStats['roc6M'], dfStats['vol6M'])
     dfStats['sharpe3M'] = getSharpeRoC(dfStats['roc3M'], dfStats['vol3M'])
 
-    #dfStats['avgSharpe'] = (dfStats[["sharpe12M", "sharpe6M", "sharpe3M"]].mean(axis=1)).round(2)  # 1st Factor
     #****************************************
     # Columns for different ranking methods
-    columns_avgSharpe = ["sharpe12M", "sharpe6M", "sharpe3M"]
+    columns_avgSharpe12_6_3 = ["sharpe12M", "sharpe6M", "sharpe3M"]
     columns_avgAll = ["sharpe12M", "sharpe9M", "sharpe6M", "sharpe3M"]
     columns_avgSharpe9_6_3 = ["sharpe9M", "sharpe6M", "sharpe3M"]
 
     # Conditional logic based on ranking_method
-    if ranking_method == "avgSharpe":
-        dfStats['avgSharpe'] = dfStats[columns_avgSharpe].mean(axis=1).round(2)
+    if ranking_method == "avgSharpe12_6_3":
+        dfStats['avgSharpe12_6_3'] = dfStats[columns_avgSharpe12_6_3].mean(axis=1).round(2)
     elif ranking_method == "avg_All":
         dfStats['avg_All'] = dfStats[columns_avgAll].mean(axis=1).round(2)
     elif ranking_method == "avgSharpe9_6_3":  # New logic
@@ -397,8 +396,8 @@ if start_button:
     dfStats['Ticker'] = dfStats['Ticker'].str.replace('.NS', '', case=False, regex=False)
 
     # Handle Nan and inf values to zero(0) for ranking
-    if ranking_method == "avgSharpe":
-        dfStats['avgSharpe'] = dfStats['avgSharpe'].replace([np.inf, -np.inf], np.nan).fillna(0)
+    if ranking_method == "avgSharpe12_6_3":
+        dfStats['avgSharpe12_6_3'] = dfStats['avgSharpe12_6_3'].replace([np.inf, -np.inf], np.nan).fillna(0)
     elif ranking_method == "avg_All":
         dfStats['avg_All'] = dfStats['avg_All'].replace([np.inf, -np.inf], np.nan).fillna(0)
     elif ranking_method == "avgSharpe9_6_3":  # New handling
@@ -414,7 +413,7 @@ if start_button:
     # Conditional logic for sorting
     if ranking_method in ["avg_All", "sharpe12M"]:
        dfStats = dfStats.sort_values(by=[ranking_method, 'roc12M'], ascending=[False, False])
-    elif ranking_method in ["avgSharpe", "sharpe3M"]:
+    elif ranking_method in ["avgSharpe12_6_3", "sharpe3M"]:
        dfStats = dfStats.sort_values(by=[ranking_method, 'roc3M'], ascending=[False, False])
     elif ranking_method == "avgSharpe9_6_3":  # New sorting rule
     	dfStats = dfStats.sort_values(by=[ranking_method, 'roc6M'], ascending=[False, False])
@@ -576,7 +575,7 @@ if start_button:
                     cell.value = round(cell.value)
 
         # Highlight "Rank" column cells where value <= threshold with light green
-        rank_threshold = 100 if "U" == 'AllNSE' else 75
+        rank_threshold = 100 if U == 'AllNSE' else 75
         light_green_fill = PatternFill(start_color="90EE90", end_color="90EE90", fill_type="solid")
         for row in range(2, ws.max_row + 1):
             cell = ws.cell(row=row, column=col_indices['Rank'])
