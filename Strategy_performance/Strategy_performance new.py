@@ -214,7 +214,7 @@ with col5:
 col1, col2, col3 = st.columns([1, 4, 1])
 
 with col1:
-    st.info("##### Filter by Date Range")
+    st.info("##### Date Range")
     start_date = st.date_input("Start Date", value=data['date'].min(), key='start_date')
     end_date = st.date_input("End Date", value=data['date'].max(), key='end_date')
 
@@ -351,7 +351,7 @@ with col3:
     # Apply conditional formatting
     def color_positive_negative(val):
         """Style positive values green and negative values light red."""
-        color = '#caf1b0' if float(val) > 0 else '#fbd9d3'
+        color = '#caf1b0' if float(val) > 0 else '#FFD6D7'
         return f'background-color: {color}'
     
     
