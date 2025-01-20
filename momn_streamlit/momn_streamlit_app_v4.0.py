@@ -1,4 +1,4 @@
-#V4.0 : Updated code in V3.0 from line
+#V4.0 : Updated code in V3.0 from line No.112 to 230.(To handle error while downloading stock data)
 import streamlit as st
 import pandas as pd
 import numpy as np
