@@ -361,5 +361,3 @@ with col3:
     # Show dataframe properly in Streamlit
     st.dataframe(styled_table, hide_index=True)
     
-
-   
