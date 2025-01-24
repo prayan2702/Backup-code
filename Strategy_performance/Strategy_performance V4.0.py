@@ -155,6 +155,55 @@ formatted_time = local_now.strftime('%d-%m-%Y %H:%M:%S')
 # st.info for the Last Update
 st.write(f"Last Update: {formatted_time}")
 st.markdown("<br><br>", unsafe_allow_html=True)
+#**********************************
+# Function to fetch portfolio stock list dynamically
+def fetch_stock_list():
+    df = pd.read_csv(google_sheets_url)
+    if "Portfolio" in df.columns:
+        return df["Portfolio"].dropna().tolist()[:30]  # Fetch first 30 stock names
+    else:
+        st.error("Portfolio column not found in Google Sheet.")
+        return []
+
+# Fetch stock list from Google Sheet
+stock_list = fetch_stock_list()
+#******************************
+# Dynamically generate the symbols for the TradingView widget
+symbols = [
+    f'{{"proName": "BSE:{stock.strip().upper()}", "title": "{stock.strip().upper()}"}}'
+    for stock in stock_list
+]
+symbols_code = ", ".join(symbols)
+
+# Updated TradingView widget code with dynamic symbols
+tradingview_widget = f"""
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+  <div class="tradingview-widget-container__widget"></div>
+  <div class="tradingview-widget-copyright">
+    <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+      <span class="blue-text">Track all markets on TradingView</span>
+    </a>
+  </div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+  {{
+    "symbols": [
+      {symbols_code}
+    ],
+    "showSymbolLogo": true,
+    "isTransparent": false,
+    "displayMode": "adaptive",
+    "colorTheme": "light",
+    "locale": "en"
+  }}
+  </script>
+</div>
+<!-- TradingView Widget END -->
+"""
+
+# Integrate the widget into Streamlit
+components.html(tradingview_widget, height=60)
+#***********************************
 
     
 # Total Account Overview Section
@@ -248,18 +297,6 @@ styled_loosers = top_10_loosers.style.map(color_grading, subset=["Change%"]).for
 styled_gainers = styled_gainers.hide(axis='index')
 styled_loosers = styled_loosers.hide(axis='index')
 #***************************
-# Function to fetch portfolio stock list dynamically
-def fetch_stock_list():
-    df = pd.read_csv(google_sheets_url)
-    if "Portfolio" in df.columns:
-        return df["Portfolio"].dropna().tolist()[:30]  # Fetch first 30 stock names
-    else:
-        st.error("Portfolio column not found in Google Sheet.")
-        return []
-
-# Fetch stock list from Google Sheet
-stock_list = fetch_stock_list()
-#**********************
 
 # Date Range Selector and Three-Column Layout
 col1, col2, col3 = st.columns([1, 4, 1])
@@ -269,6 +306,7 @@ with col1:
     start_date = st.date_input("Start Date", value=data['date'].min(), key='start_date')
     end_date = st.date_input("End Date", value=data['date'].max(), key='end_date')
     st.markdown("<br><br><br>", unsafe_allow_html=True)
+    
 
     # Add "Top 10 Gainers" table with color grading
     st.info("##### Today's Gainers")
@@ -380,7 +418,7 @@ with col2:
           "symbols": {symbols},
           "chartOnly": false,
           "width": "100%",
-          "height": "600",
+          "height": "500",
           "locale": "en",
           "colorTheme": "light",
           "autosize": true,
@@ -423,58 +461,7 @@ with col2:
         st.warning("No stocks available for the symbol overview widget.")
 
 #*****************
-    # Add Market Data Widget below the charts
-    if stock_list:
-        st.info("##### Market Data Portfolio")
-    
-        # Generate TradingView Symbol Overview widget code
-        symbols = [[stock.strip().upper(), f"BSE:{stock.strip().upper()}|1D"] for stock in stock_list]
 
-        # Generate TradingView Symbol Overview widget code dynamically
-        symbol_entries = [
-            f'{{"name": "{symbol[1].split("|")[0]}", "displayName": "{symbol[0]}"}}'
-            for symbol in symbols
-        ]
-        symbols_code = ", ".join(symbol_entries)
-    
-        tradingview_widget = f"""
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-          <div class="tradingview-widget-container__widget"></div>
-          <div class="tradingview-widget-copyright">
-            <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-              <span class="blue-text">Track all markets on TradingView</span>
-            </a>
-          </div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
-          {{
-            "width": "500",
-            "height": "1000",
-            "symbolsGroups": [
-              {{
-                "name": "Portfolio",
-                "symbols": [
-                  {symbols_code}
-                ]
-              }}
-            ],
-            "showSymbolLogo": true,
-            "isTransparent": false,
-            "colorTheme": "light",
-            "locale": "en",
-            "backgroundColor": "#ffffff"
-          }}
-          </script>
-        </div>
-        <!-- TradingView Widget END -->
-        """
-    
-        # Render the HTML content
-        components.html(tradingview_widget, height=600)
-    else:
-        st.warning("No stocks available for the symbol overview widget.")
-
-#**********************************
 
 # Model Performance Section in col3
 with col3:
@@ -541,5 +528,3 @@ with col3:
     # Show dataframe properly in Streamlit
     st.dataframe(styled_table, hide_index=True)
     
-
-   
