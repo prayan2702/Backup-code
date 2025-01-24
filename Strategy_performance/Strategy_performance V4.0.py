@@ -175,16 +175,12 @@ symbols = [
 ]
 symbols_code = ", ".join(symbols)
 
-# Updated TradingView widget code with dynamic symbols
+# Updated TradingView widget code without the text span
 tradingview_widget = f"""
 <!-- TradingView Widget BEGIN -->
 <div class="tradingview-widget-container">
   <div class="tradingview-widget-container__widget"></div>
-  <div class="tradingview-widget-copyright">
-    <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-      <span class="blue-text">Track all markets on TradingView</span>
-    </a>
-  </div>
+  <div class="tradingview-widget-copyright"></div>  <!-- Removed the unnecessary text -->
   <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
   {{
     "symbols": [
@@ -202,7 +198,7 @@ tradingview_widget = f"""
 """
 
 # Integrate the widget into Streamlit
-components.html(tradingview_widget, height=60)
+components.html(tradingview_widget, height=80)
 #***********************************
 
     
@@ -408,11 +404,7 @@ with col2:
         <!-- TradingView Widget BEGIN -->
         <div class="tradingview-widget-container">
           <div class="tradingview-widget-container__widget"></div>
-          <div class="tradingview-widget-copyright">
-            <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-              <span class="blue-text">Track all markets on TradingView</span>
-            </a>
-          </div>
+          <div class="tradingview-widget-copyright"></div>
           <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
           {{
           "symbols": {symbols},
@@ -461,7 +453,45 @@ with col2:
         st.warning("No stocks available for the symbol overview widget.")
 
 #*****************
-
+    # Static TradingView widget HTML code for global indices
+    widget_html = """
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <div class="tradingview-widget-copyright"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+      {
+      "symbols": [
+        {
+          "proName": "FOREXCOM:SPXUSD",
+          "title": "S&P 500 Index"
+        },
+        {
+          "description": "NASDAQ",
+          "proName": "NASDAQ:NDX"
+        },
+        {
+          "description": "Gold",
+          "proName": "TVC:GOLD"
+        },
+        {
+          "description": "CRUIDE OIL",
+          "proName": "BLACKBULL:BRENT"
+        }
+      ],
+      "isTransparent": false,
+      "showSymbolLogo": true,
+      "colorTheme": "light",
+      "locale": "en"
+      }
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    """
+    
+    # Embed the widget in your Streamlit app using markdown
+    components.html(widget_html, height=200)
+#**********************************************
 
 # Model Performance Section in col3
 with col3:
@@ -528,3 +558,5 @@ with col3:
     # Show dataframe properly in Streamlit
     st.dataframe(styled_table, hide_index=True)
     
+
+   
