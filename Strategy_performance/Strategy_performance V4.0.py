@@ -362,66 +362,101 @@ with col2:
     st.plotly_chart(fig_dd, use_container_width=True)
 
 #**********************
-    # Add Symbol Overview Widget below the charts
-    if stock_list:
-        st.info("##### Portfolio Symbol Overview")
+    # # Add Symbol Overview Widget below the charts
+    # if stock_list:
+    #     st.info("##### Portfolio Symbol Overview")
     
-        # Generate TradingView Symbol Overview widget code
-        symbols = [[stock.strip().upper(), f"BSE:{stock.strip().upper()}|1D"] for stock in stock_list]
+    #     # Generate TradingView Symbol Overview widget code
+    #     symbols = [[stock.strip().upper(), f"BSE:{stock.strip().upper()}|1D"] for stock in stock_list]
     
-        symbol_overview_code = f"""
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-          <div class="tradingview-widget-container__widget"></div>
-          <div class="tradingview-widget-copyright"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
-          {{
-          "symbols": {symbols},
-          "chartOnly": false,
-          "width": "100%",
-          "height": "500",
-          "locale": "en",
-          "colorTheme": "light",
-          "autosize": true,
-          "showVolume": false,
-          "showMA": false,
-          "hideDateRanges": false,
-          "hideMarketStatus": false,
-          "hideSymbolLogo": false,
-          "scalePosition": "right",
-          "scaleMode": "Normal",
-          "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
-          "fontSize": "10",
-          "noTimeScale": false,
-          "valuesTracking": "1",
-          "changeMode": "price-and-percent",
-          "chartType": "area",
-          "maLineColor": "#2962FF",
-          "maLineWidth": 1,
-          "maLength": 9,
-          "headerFontSize": "medium",
-          "lineWidth": 2,
-          "lineType": 0,
-          "dateRanges": [
-            "1d|1",
-            "1m|30",
-            "3m|60",
-            "12m|1D",
-            "60m|1W",
-            "all|1M"
-          ]
-          }}
-          </script>
-        </div>
-        <!-- TradingView Widget END -->
-        """.replace("'", '"')  # Replace single quotes with double quotes for JSON compliance
+    #     symbol_overview_code = f"""
+    #     <!-- TradingView Widget BEGIN -->
+    #     <div class="tradingview-widget-container">
+    #       <div class="tradingview-widget-container__widget"></div>
+    #       <div class="tradingview-widget-copyright"></div>
+    #       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+    #       {{
+    #       "symbols": {symbols},
+    #       "chartOnly": false,
+    #       "width": "100%",
+    #       "height": "500",
+    #       "locale": "en",
+    #       "colorTheme": "light",
+    #       "autosize": true,
+    #       "showVolume": false,
+    #       "showMA": false,
+    #       "hideDateRanges": false,
+    #       "hideMarketStatus": false,
+    #       "hideSymbolLogo": false,
+    #       "scalePosition": "right",
+    #       "scaleMode": "Normal",
+    #       "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+    #       "fontSize": "10",
+    #       "noTimeScale": false,
+    #       "valuesTracking": "1",
+    #       "changeMode": "price-and-percent",
+    #       "chartType": "area",
+    #       "maLineColor": "#2962FF",
+    #       "maLineWidth": 1,
+    #       "maLength": 9,
+    #       "headerFontSize": "medium",
+    #       "lineWidth": 2,
+    #       "lineType": 0,
+    #       "dateRanges": [
+    #         "1d|1",
+    #         "1m|30",
+    #         "3m|60",
+    #         "12m|1D",
+    #         "60m|1W",
+    #         "all|1M"
+    #       ]
+    #       }}
+    #       </script>
+    #     </div>
+    #     <!-- TradingView Widget END -->
+    #     """.replace("'", '"')  # Replace single quotes with double quotes for JSON compliance
     
-        # Render the HTML content
-        components.html(symbol_overview_code, height=500)
-    else:
-        st.warning("No stocks available for the symbol overview widget.")
+    #     # Render the HTML content
+    #     components.html(symbol_overview_code, height=500)
+    # else:
+    #     st.warning("No stocks available for the symbol overview widget.")
 
 #*****************
+   # Dropdown to select a stock
+    if stock_list:
+        selected_stock = st.selectbox("Select a Stock:", stock_list)
+    
+        # TradingView widget code
+        if selected_stock:
+            widget_code = f"""
+            <!-- TradingView Widget BEGIN -->
+            <div class="tradingview-widget-container" style="width: 100%; max-width: 980px; margin: 0 auto;">
+                <div class="tradingview-widget-container__widget" style="height: 610px; width: 100%;"></div>
+                <div class="tradingview-widget-copyright"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {{
+                    "width": "935",
+                    "height": "530",
+                    "symbol": "{selected_stock}",
+                    "interval": "D",
+                    "timezone": "Etc/UTC",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "en",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "hide_volume": true,
+                    "support_host": "https://www.tradingview.com"
+                }}
+                </script>
+            </div>
+            <!-- TradingView Widget END -->
+            """
+            # Render the widget in Streamlit
+            st.components.v1.html(widget_code, height=550)  # Height slightly more for padding
+    else:
+        st.warning("No stocks available in the portfolio.")
+    #**********************************
     # Dynamically generate the symbols for the TradingView widget
     symbols = [
         f'{{"proName": "BSE:{stock.strip().upper()}", "title": "{stock.strip().upper()}"}}'
@@ -558,3 +593,6 @@ with col3:
     
     # Show dataframe properly in Streamlit
     st.dataframe(styled_table, hide_index=True)
+    
+
+   
