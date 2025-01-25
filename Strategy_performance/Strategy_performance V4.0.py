@@ -485,7 +485,20 @@ with col2:
         st.warning("No stocks available in the portfolio.")
     #**********************************
     # Streamlit App Layout
-    st.info("##### Heatmap")
+    st.markdown("<h3 style='text-align: center;'>Heatmap</h3>", unsafe_allow_html=True)
+    
+    # Custom CSS to set background of Streamlit container to white
+    st.markdown("""
+        <style>
+            .reportview-container .main .block-container {
+                background-color: white;
+            }
+            .css-1y4v0b4 {
+                background-color: white;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+    
     if not portfolio_data.empty:
         # Create a treemap heatmap using Plotly
         fig = px.treemap(
@@ -508,12 +521,14 @@ with col2:
         fig.update_traces(
             textinfo="label+value",  # Show stock name and value
             textfont=dict(color="white"),
-            textfont_size=18,        # Increase font size
-            texttemplate="<b>%{label}</b><br>%{value}",  # Format text to show label and value
-            insidetextfont=dict(size=20),  # Adjust inside text font properties if needed
+            textfont_size=1,        # Increase font size
+            texttemplate="%{label}<br>%{value}",  # Format text to show label and value
+            insidetextfont=dict(size=36),  # Adjust inside text font properties if needed
+            textposition="middle center",  # Center the text inside the box
         )
         fig.update_layout(
             margin=dict(t=0, l=0, r=0, b=0),  # Adjust margins
+            height=600,  # Fix height to control the chart’s size
             coloraxis_colorbar=dict(
                 title="Change (%)",
                 tickformat=".1f",
@@ -521,7 +536,10 @@ with col2:
                 x=0.5,  # Move to bottom center
                 y=-0.2,  # Move below chart
                 tickvals=[-5, 0, 5],  # Example tick values
-            )
+            ),
+            # Set background color of the Plotly chart container
+            plot_bgcolor="white",  # Background inside the plot area
+            paper_bgcolor="white",  # Background outside the plot area
         )
     
         # Display the treemap heatmap
