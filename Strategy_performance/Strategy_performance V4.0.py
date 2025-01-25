@@ -188,7 +188,7 @@ tradingview_widget = f"""
     ],
     "showSymbolLogo": true,
     "isTransparent": false,
-    "displayMode": "adaptive",
+    "displayMode": "compact",
     "colorTheme": "light",
     "locale": "en"
   }}
@@ -198,7 +198,7 @@ tradingview_widget = f"""
 """
 
 # Integrate the widget into Streamlit
-components.html(tradingview_widget, height=80)
+components.html(tradingview_widget, height=85)
 #***********************************
 
     
