@@ -168,6 +168,28 @@ def fetch_stock_list():
 # Fetch stock list from Google Sheet
 stock_list = fetch_stock_list()
 #******************************
+# Function to fetch portfolio data from Google Sheets
+def fetch_portfolio_data():
+    try:
+        df = pd.read_csv(google_sheets_url)
+        if "Portfolio" in df.columns and "Today Change" in df.columns:
+            # Extract and preprocess the data
+            df = df[["Portfolio", "Today Change"]].dropna()
+            df["Today Change"] = df["Today Change"].str.replace('%', '', regex=False).astype(float)  # Remove '%' and convert to float
+            df = df.head(30)  # Limit to the first 30 stocks
+            df["Size"] = df["Today Change"].abs()  # Add column for box sizing
+            return df
+        else:
+            st.error("Required columns ('Portfolio', 'Today Change') not found in the Google Sheet.")
+            return pd.DataFrame()
+    except Exception as e:
+        st.error(f"Error fetching data: {e}")
+        return pd.DataFrame()
+
+# Fetch data
+portfolio_data = fetch_portfolio_data()
+
+#******************************
 
 
     
@@ -462,6 +484,51 @@ with col2:
     else:
         st.warning("No stocks available in the portfolio.")
     #**********************************
+    # Streamlit App Layout
+    st.info("##### Heatmap")
+    if not portfolio_data.empty:
+        # Create a treemap heatmap using Plotly
+        fig = px.treemap(
+            portfolio_data,
+            path=["Portfolio"],  # Stock names as labels
+            values="Size",  # Dynamic sizing based on percentage change
+            color="Today Change",  # Values for coloring
+            color_continuous_scale=[
+                "#8B0000",  # Dark Red
+                "#FF4500",  # Red-Orange
+                "#FF6347",  # Tomato Red
+                "#F0F0F0",  # Neutral Gray
+                "#90EE90",  # Light Green
+                "#32CD32",  # Lime Green
+                "#006400"   # Dark Green
+            ],  # Custom color grading
+            range_color=[-5, 5],  # Fix color scale range
+        )
+    
+        fig.update_traces(
+            textinfo="label+value",  # Show stock name and value
+            textfont=dict(color="white"),
+            textfont_size=18,        # Increase font size
+            texttemplate="<b>%{label}</b><br>%{value}",  # Format text to show label and value
+            insidetextfont=dict(size=20),  # Adjust inside text font properties if needed
+        )
+        fig.update_layout(
+            margin=dict(t=0, l=0, r=0, b=0),  # Adjust margins
+            coloraxis_colorbar=dict(
+                title="Change (%)",
+                tickformat=".1f",
+                orientation="h",  # Horizontal alignment
+                x=0.5,  # Move to bottom center
+                y=-0.2,  # Move below chart
+                tickvals=[-5, 0, 5],  # Example tick values
+            )
+        )
+    
+        # Display the treemap heatmap
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No data available to display.")
+    #********************************
     # Dynamically generate the symbols for the TradingView widget
     symbols = [
         f'{{"proName": "BSE:{stock.strip().upper()}", "title": "{stock.strip().upper()}"}}'
