@@ -1,6 +1,6 @@
 #V6.0: added login page so indentation altered for whole code
 #V7.0: added Reason for exit after portfolio rebalancing
-#V8.0: added failed stock download by analyzing volm_cr column blank
+#V8.0: added failed stock download List by analyzing volm_cr column blank
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -276,7 +276,8 @@ def app_content():
         median_volume = volume12M.median()
     
         # Identify stocks with blank or 0 data in the volm_cr column
-        failed_download_stocks = median_volume[median_volume.isna() | (median_volume == 0)].index.tolist()
+        # failed_download_stocks = median_volume[median_volume.isna() | (median_volume == 0)].index.tolist()
+        failed_download_stocks = median_volume[median_volume.isna()].index.tolist()
     
         # Remove the .NS suffix from the ticker names
         failed_download_stocks = [ticker.replace('.NS', '') for ticker in failed_download_stocks]
