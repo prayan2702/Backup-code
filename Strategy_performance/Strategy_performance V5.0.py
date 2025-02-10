@@ -1,3 +1,4 @@
+#v5.0: Added retry and delay without caching for data loading from google sheet
 import streamlit as st
 import pandas as pd
 import datetime
