@@ -753,6 +753,76 @@ def app_content():
         
         # Show dataframe properly in Streamlit
         st.dataframe(styled_table, hide_index=True)
+         # *******************************
+         # Add Market Indices Table with Live Data
+        st.info("##### Broader Indices")
+
+        # Define indices to fetch from Yahoo Finance
+        indices_dict = {
+            "NIFTY 50": "^NSEI",
+            "NIFTY BANK": "^NSEBANK",
+            "NIFTY NEXT 50": "^NSMIDCP",
+            "NIFTY 500": "^CRSLDX",
+            "NIFTY TOTAL MKT": "NIFTY_TOTAL_MKT.NS",
+            "N200MOMENTM30": "NIFTY200MOMENTM30.NS",
+            "NIFTY ALPHA 50": "NIFTYALPHA50.NS",
+            "MIDCAP 100": "NIFTY_MIDCAP_100.NS",
+            "SMLCAP 100": "^CNXSC",
+            "NIFTY MICROCAP250": "NIFTY_MICROCAP250.NS",
+            "INDIA VIX": "^INDIAVIX",
+            "Dow Jones": "^DJI",
+        }
+        
+        # Fetch live data
+        index_data = []
+        for name, ticker in indices_dict.items():
+            try:
+                index = yf.Ticker(ticker)
+                info = index.info
+                
+                # Get Live CMP with fallback
+                cmp = info.get("regularMarketPrice")  # Live CMP
+                if cmp is None:
+                    hist = index.history(period="1d")
+                    cmp = hist['Close'].iloc[-1] if not hist.empty else "N/A"  # Use last close if live price is missing
+
+                # Get Previous Close
+                prev_close = info.get("regularMarketPreviousClose", cmp)  # Use CMP if previous close is missing
+                
+                # Ensure valid numbers before calculation
+                if isinstance(cmp, (int, float)) and isinstance(prev_close, (int, float)) and prev_close > 0:
+                    percent_change = ((cmp - prev_close) / prev_close) * 100
+                    index_data.append([name, percent_change])  # Store as float for sorting
+                else:
+                    index_data.append([name, None])  # Handle missing values
+            
+            except Exception as e:
+                index_data.append([name, None])  # Handle errors
+        
+        # Convert to DataFrame (WITHOUT CMP COLUMN)
+        indices_df = pd.DataFrame(index_data, columns=["Indices", "% Change"])
+
+        # Remove None values and sort by % Change in descending order
+        indices_df = indices_df.dropna().sort_values(by="% Change", ascending=False)
+
+        # Format % Change column to show 2 decimal places
+        indices_df["% Change"] = indices_df["% Change"].apply(lambda x: f"{x:.2f}%")
+
+        # Apply styling for color coding
+        def color_format(val):
+            """Style positive values green and negative values red."""
+            try:
+                if val.endswith("%"):
+                    num_val = float(val.replace("%", ""))
+                    color = "green" if num_val > 0 else "red"
+                    return f"color: {color}"
+            except:
+                return ""  # No formatting for errors or 'N/A'
+
+        styled_indices_df = indices_df.style.map(color_format, subset=["% Change"])
+
+        # Display the table
+        st.dataframe(styled_indices_df, hide_index=True)
     # ***************************************************************
 if not st.session_state.logged_in:
     login()
